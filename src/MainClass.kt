@@ -3,22 +3,27 @@ import generator.TestGeneratorFactory
 import prompt.SimplePrompt
 import java.io.File
 
-const val CODE_DIR_NAME = "code"
+const val CODE_DIR_NAME = "testData"
 const val RESULT_DIR_NAME = "result"
 
 fun main(args: Array<String>) {
-    val copilotPath = "/Users/Ievgen_Bogatov/IdeaProjects/LLMTestWriting/testData/copilot"
-    val geminiPath = "/Users/Ievgen_Bogatov/IdeaProjects/LLMTestWriting/testData/gemini"
-    val gptPath = "/Users/Ievgen_Bogatov/IdeaProjects/LLMTestWriting/testData/gpt"
+    val sysDir = System.getProperty("user.dir")
+    val copilotPath = "result/copilot"
+    val geminiPath = "result/gemini"
+    val gptPath = "result/gpt"
     val promptGenerator = SimplePrompt()
     val testGenerator = TestGeneratorFactory.create(Generators.GPT)
 
-    val llmList = listOf(gptPath, geminiPath, copilotPath)
+    val llmList = listOf(gptPath, geminiPath)
 
     llmList.forEach { llmPath ->
         println("Launch logic for llm path: $llmPath")
-        if (validateDirectoryStructure(llmPath)) {
-            val codebasePath = llmPath + File.separator + CODE_DIR_NAME
+        if (validateDirectoryStructure(
+                codeDirectoryPath = sysDir + File.separator + CODE_DIR_NAME,
+                llmPath = sysDir + File.separator + llmPath
+            )
+        ) {
+            val codebasePath = sysDir + File.separator + CODE_DIR_NAME
             val codebaseFiles = getPathContent(codebasePath)
             codebaseFiles?.forEach { file ->
                 println("Processing code of file: $file")
@@ -31,19 +36,19 @@ fun main(args: Array<String>) {
                 val result = testGenerator.generateTestsFor(llmPrompt, codebase)
 
                 println("Result is received: ${result.subSequence(0, 30)}")
-                savePromptResult(llmPath, file.name, result)
+                savePromptResult(sysDir + File.separator + llmPath, file.name, result)
             }
         }
     }
 }
 
 @Throws(IllegalArgumentException::class)
-private fun validateDirectoryStructure(llmPath: String): Boolean {
-    val file = File(llmPath)
-    val codeDirectory = File(llmPath + File.separator + CODE_DIR_NAME)
+private fun validateDirectoryStructure(codeDirectoryPath: String, llmPath: String): Boolean {
+    val llmDirectory = File(llmPath)
+    val codeDirectory = File(codeDirectoryPath)
 
     try {
-        if (file.isDirectory.not() || !file.exists())
+        if (llmDirectory.isDirectory.not() || !llmDirectory.exists())
             throw IllegalArgumentException("The passed path is not a directory one or absent")
         if (codeDirectory.isDirectory.not() || !codeDirectory.exists())
             throw IllegalArgumentException("The passed code directory path is not a directory one or absent")
@@ -52,10 +57,10 @@ private fun validateDirectoryStructure(llmPath: String): Boolean {
 
     } catch (e: Exception) {
         print(e)
-        println("Llm Path is invalid")
+        println("Directory structure is invalid")
         return false
     }
-    println("Llm Path is valid")
+    println("Directory structure is valid")
     return true
 }
 
@@ -82,7 +87,7 @@ private fun savePromptResult(folderPath: String, fileName: String, testCodebase:
     println("Save results to ${resultsFolderForTheRunInstance.absolutePath}")
     val file = File(fileName)
 
-    if (!file.exists()) resultsFolder.mkdirs()
+    if (!resultsFolderForTheRunInstance.exists()) resultsFolder.mkdirs()
 
     if (resultsFolderForTheRunInstance.exists()) {
         file.deleteRecursively()

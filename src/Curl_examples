@@ -1,0 +1,26 @@
+GPT chat example
+------------------------------------------------------------------------------------------------
+curl https://api.openai.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: GPT_API_KEY" \
+  -d '{
+    "model": "gpt-4o-mini",
+    "store": true,
+    "messages": [
+      {"role": "user", "content": "write a haiku about ai"}
+    ]
+  }'
+------------------------------------------------------------------------------------------------
+
+
+  Gemini example
+ ------------------------------------------------------------------------------------------------
+  curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=GEMINI_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -X POST \
+  -d '{
+    "contents": [{
+      "parts":[{"text": "Explain how AI works"}]
+      }]
+     }'
+------------------------------------------------------------------------------------------------
