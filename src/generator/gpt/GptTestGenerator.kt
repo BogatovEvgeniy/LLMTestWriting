@@ -18,7 +18,7 @@ object GptTestGenerator : TestGenerator {
     var service: GPTCompletionService
 
     init {
-        val retrofit = RestClientFactory.create(Secrets.GPTSecret)
+        val retrofit = RestClientFactory.create(Secrets.gptHost)
         service = retrofit.create(GPTCompletionService::class.java)
     }
 
@@ -34,7 +34,7 @@ object GptTestGenerator : TestGenerator {
 
         @Headers(
             "Content-Type: application/json",
-            "Authorization:ADD_API_KEY_HERE"
+            "Authorization:${Secrets.gptApiKey}"
         )
         @POST("chat/completions")
         fun chatCompletions(
