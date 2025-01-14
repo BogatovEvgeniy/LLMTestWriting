@@ -19,18 +19,18 @@ object CodeLlamaTestGenerator : TestGenerator {
 
     override fun generateTestsFor(llmPrompt: String, code: String): String {
         val response = service.generateTests(
-            CodeLlamaRequest(
-                inputs = buildPrompt(llmPrompt, code),
-                parameters = GenerationParameters(
-                    maxNewTokens = 1000,
-                    temperature = 0.7,
-                    topP = 0.95,
-                    repetitionPenalty = 1.1
-                )
+            LlamaCompletionRequest(
+               messages = listOf(Message(role = "user", content = buildPrompt(llmPrompt, code))),
+//                parameters = GenerationParameters(
+//                    maxNewTokens = 1000,
+//                    temperature = 0.7,
+//                    topP = 0.95,
+//                    repetitionPenalty = 1.1
+//                )
             )
         ).execute()
 
-        return response.body()?.firstOrNull()?.generatedText
+        return response.body()?.choices?. firstOrNull()?.toString()
             ?: "No test cases were generated"
     }
 
@@ -58,7 +58,7 @@ object CodeLlamaTestGenerator : TestGenerator {
             "Content-Type: application/json",
             "Authorization: Bearer ${Secrets.codellamaApiKey}"
         )
-        @POST("models/codellama/CodeLlama-34b-Instruct-hf")
-        fun generateTests(@Body request: CodeLlamaRequest): Call<List<CodeLlamaResponse>>
+        @POST("chat/completions")
+        fun generateTests(@Body request: LlamaCompletionRequest): Call<LamaCompletionResponse>
     }
 }
