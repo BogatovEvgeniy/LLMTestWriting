@@ -17,14 +17,14 @@ object GeminiTestGenerator : TestGenerator {
     val service: GenerateContentService
 
     init {
-        val retrofit = RestClientFactory.create(Secrets.GeminiSecret)
+        val retrofit = RestClientFactory.create(Secrets.geminiHost)
         service = retrofit.create(GenerateContentService::class.java)
     }
 
     override fun generateTestsFor(llmPrompt: String, code: String): String {
         val responseBody = service.generateContent(
             RequestData(contents = listOf(ContentPart(parts = listOf(TextPart("$llmPrompt for $code"))))),
-            Secrets.GeminiSecret.apiKey
+            Secrets.geminiApiKey
         ).execute().body()
         return responseBody?.candidates?.firstOrNull()?.content?.toString() ?: "An empty value has been returned"
     }
