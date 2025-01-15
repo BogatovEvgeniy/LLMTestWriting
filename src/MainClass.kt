@@ -1,115 +1,82 @@
 import generator.Generators
-import generator.TestGenerator
 import generator.TestGeneratorFactory
 import prompt.SimplePrompt
 import java.io.File
 
-const val CODE_DIR_NAME = "testData"
-const val RESULT_DIR_NAME = "result"
-
-fun main(args: Array<String>) {
+fun main() {
     val sysDir = System.getProperty("user.dir")
-    val copilotPath = "result/copilot"
-    val geminiPath = "result/gemini"
-    val gptPath = "result/gpt"
-    val codeLlamaPath = "result/codellama"  // Added CodeLlama path
     val promptGenerator = SimplePrompt()
 
-    // You can change this to use different generators
-    val testGenerator = TestGeneratorFactory.create(Generators.CODELLAMA)
+    // Create session folder
+    val sessionNumber = getNextSessionNumber(sysDir)
+    println("Starting Session $sessionNumber")
 
-    // Updated list to include CodeLlama
-    val llmList = listOf(gptPath, geminiPath, codeLlamaPath)
-
-    llmList.forEach { llmPath ->
-        try {
-            println("Launch logic for llm path: $llmPath")
-            if (validateDirectoryStructure(
-                    codeDirectoryPath = sysDir + File.separator + CODE_DIR_NAME,
-                    llmPath = sysDir + File.separator + llmPath
-                )
-            ) {
-                processCodebase(sysDir, llmPath, promptGenerator, testGenerator)
-            }
-        } catch (e: Exception) {
-            println("Error processing $llmPath: ${e.message}")
-        }
+    // Process each LLM
+    listOf(
+        Generators.GPT,
+        Generators.GEMINI,
+        //Generators.CODELLAMA
+    ).forEach { generator ->
+        generateTestsForLLM(sysDir, sessionNumber, generator, promptGenerator)
     }
 }
 
-private fun processCodebase(
+private fun generateTestsForLLM(
     sysDir: String,
-    llmPath: String,
-    promptGenerator: SimplePrompt,
-    testGenerator: TestGenerator
+    sessionNumber: Int,
+    generator: Generators,
+    promptGenerator: SimplePrompt
 ) {
-    val codebasePath = sysDir + File.separator + CODE_DIR_NAME
-    val codebaseFiles = getPathContent(codebasePath)
+    println("\nGenerating tests using ${generator.name}")
 
-    codebaseFiles?.forEach { file ->
+    val resultPath = when(generator) {
+        Generators.GPT -> "result/gpt"
+        Generators.GEMINI -> "result/gemini"
+        Generators.CODELLAMA -> "result/codellama"
+        else -> "result/other"
+    }
+
+    val testGenerator = TestGeneratorFactory.create(generator)
+    val sessionFolder = File(sysDir, "$resultPath/session$sessionNumber")
+    sessionFolder.mkdirs()
+
+    // Process each file in testData
+    val codeDir = File(sysDir, "testData")
+    codeDir.listFiles()?.forEach { file ->
         try {
-            println("Processing code of file: ${file.name}")
-            val codebase = readFileCodebase(codebasePath, file.name)
-
-            println("Code read from file: ${codebase.take(30)}...")
+            println("Processing: ${file.name}")
+            val code = file.readText()
             val llmPrompt = promptGenerator.generatePrompt()
 
-            println("Use prompt: ${llmPrompt.take(30)}...")
-            val result = testGenerator.generateTestsFor(llmPrompt, codebase)
+            // Generate and save tests
+            val generatedTests = testGenerator.generateTestsFor(llmPrompt, code)
+            File(sessionFolder, file.name).writeText(generatedTests)
 
-            println("Result is received: ${result.take(30)}...")
-            savePromptResult(sysDir + File.separator + llmPath, file.name, result)
+            println("Tests generated for: ${file.name}")
+            println("Saved to: ${sessionFolder.absolutePath}/${file.name}")
         } catch (e: Exception) {
-            println("Error processing file ${file.name}: ${e.message}")
+            println("Error processing ${file.name}: ${e.message}")
         }
     }
 }
 
-@Throws(IllegalArgumentException::class)
-private fun validateDirectoryStructure(codeDirectoryPath: String, llmPath: String): Boolean {
-    val llmDirectory = File(llmPath)
-    val codeDirectory = File(codeDirectoryPath)
+private fun getNextSessionNumber(sysDir: String): Int {
+    val resultDirs = listOf("result/gpt", "result/gemini", "result/codellama")
+    var maxSession = 0
 
-    return try {
-        when {
-            !llmDirectory.exists() || !llmDirectory.isDirectory ->
-                throw IllegalArgumentException("The LLM path is not a valid directory: $llmPath")
-            !codeDirectory.exists() || !codeDirectory.isDirectory ->
-                throw IllegalArgumentException("The code directory path is not valid: $codeDirectoryPath")
-            codeDirectory.listFiles().isNullOrEmpty() ->
-                throw IllegalArgumentException("The code directory is empty: ${codeDirectory.absolutePath}")
-            else -> true
+    resultDirs.forEach { dirPath ->
+        val dir = File(sysDir, dirPath)
+        if (dir.exists()) {
+            dir.listFiles { file ->
+                file.isDirectory && file.name.startsWith("session")
+            }?.forEach { sessionDir ->
+                val sessionNum = sessionDir.name.removePrefix("session").toIntOrNull() ?: 0
+                if (sessionNum > maxSession) {
+                    maxSession = sessionNum
+                }
+            }
         }
-    } catch (e: Exception) {
-        println("Directory structure validation failed: ${e.message}")
-        false
     }
-}
 
-private fun getPathContent(codePath: String): Array<out File>? =
-    File(codePath).listFiles()
-
-private fun readFileCodebase(codePath: String, fileName: String): String {
-    val codebaseFile = File(codePath + File.separator + fileName)
-    return when {
-        codebaseFile.exists() && codebaseFile.isFile -> codebaseFile.readText()
-        else -> throw IllegalArgumentException("Invalid file path: ${codebaseFile.absolutePath}")
-    }
-}
-
-private fun savePromptResult(folderPath: String, fileName: String, testCodebase: String) {
-    val timeStamp = System.currentTimeMillis()
-    val resultsFolderPath = folderPath + File.separator + RESULT_DIR_NAME + "_" + timeStamp
-    val resultsFolder = File(resultsFolderPath)
-    val resultFile = File(resultsFolderPath + File.separator + fileName)
-
-    println("Saving results to $resultsFolderPath")
-
-    try {
-        resultsFolder.mkdirs()
-        resultFile.createNewFile()
-        resultFile.writeText(testCodebase)
-    } catch (e: Exception) {
-        println("Error saving results: ${e.message}")
-    }
+    return maxSession + 1
 }
