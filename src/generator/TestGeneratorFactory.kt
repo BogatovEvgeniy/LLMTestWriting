@@ -2,6 +2,7 @@ package generator
 
 import generator.gemini.GeminiTestGenerator
 import generator.gpt.GptTestGenerator
+import generator.codellama.CodeLlamaTestGenerator
 
 class TestGeneratorFactory {
     companion object {
@@ -10,6 +11,7 @@ class TestGeneratorFactory {
                 Generators.COPILOT -> CopilotTestGenerator
                 Generators.GEMINI -> GeminiTestGenerator
                 Generators.GPT -> GptTestGenerator
+                Generators.CODELLAMA -> CodeLlamaTestGenerator
             }
         }
     }

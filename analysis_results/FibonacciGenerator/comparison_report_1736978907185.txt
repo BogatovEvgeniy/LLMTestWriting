@@ -1,0 +1,53 @@
+Test Generator Comparison Report
+================================
+
+1. GPT
+Score: 91
+Basic Metrics:
+  - Total Tests: 5
+  - Total Assertions: 14
+  - Avg Assertions per Test: 2.8
+Coverage:
+  - Methods Covered: [getSequence, isFibonacciNumber]
+  - Edge Cases: 0/5
+Quality:
+  - Descriptive Names: true
+  - Assertion Variety: true
+Readability:
+  - Uses Backticks: true
+  - Has Comments: true
+  - Average Test Length: 12
+
+2. GEMINI
+Score: 87
+Basic Metrics:
+  - Total Tests: 10
+  - Total Assertions: 16
+  - Avg Assertions per Test: 1.6
+Coverage:
+  - Methods Covered: [generateSequence, getSequence, isFibonacciNumber]
+  - Edge Cases: 0/5
+Quality:
+  - Descriptive Names: false
+  - Assertion Variety: true
+Readability:
+  - Uses Backticks: true
+  - Has Comments: true
+  - Average Test Length: 9
+
+3. CODELLAMA
+Score: 83
+Basic Metrics:
+  - Total Tests: 9
+  - Total Assertions: 13
+  - Avg Assertions per Test: 1.4444444444444444
+Coverage:
+  - Methods Covered: [getSequence, isFibonacciNumber]
+  - Edge Cases: 0/5
+Quality:
+  - Descriptive Names: true
+  - Assertion Variety: true
+Readability:
+  - Uses Backticks: true
+  - Has Comments: false
+  - Average Test Length: 8

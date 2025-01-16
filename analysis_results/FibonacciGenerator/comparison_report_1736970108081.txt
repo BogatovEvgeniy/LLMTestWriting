@@ -1,0 +1,19 @@
+Test Generator Comparison Report
+================================
+
+1. GPT
+Score: 91
+Basic Metrics:
+  - Total Tests: 7
+  - Total Assertions: 26
+  - Avg Assertions per Test: 3.7142857142857144
+Coverage:
+  - Methods Covered: [getSequence, isFibonacciNumber]
+  - Edge Cases: 0/5
+Quality:
+  - Descriptive Names: true
+  - Assertion Variety: true
+Readability:
+  - Uses Backticks: true
+  - Has Comments: true
+  - Average Test Length: 12

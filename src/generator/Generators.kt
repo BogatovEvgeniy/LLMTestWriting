@@ -1,5 +1,5 @@
 package generator
 
 enum class Generators {
-    COPILOT, GEMINI, GPT
+    COPILOT, GEMINI, GPT, CODELLAMA
 }
