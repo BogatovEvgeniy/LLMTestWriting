@@ -1,6 +1,6 @@
 package testMetrics.parser
 
-class CodeParser(private val code: String) {
+class CodeParser {
     data class ParseResult(
         val branches: List<Branch>,
         val conditions: List<Condition>,
@@ -10,14 +10,14 @@ class CodeParser(private val code: String) {
 
     fun parse(code: String): ParseResult {
         return ParseResult(
-            branches = findBranches(),
-            conditions = findConditions(),
-            statements = findStatements(),
-            paths = findPaths()
+            branches = findBranches(code),
+            conditions = findConditions(code),
+            statements = findStatements(code),
+            paths = findPaths(code)
         )
     }
 
-    private fun findBranches(): List<Branch> {
+    private fun findBranches(code: String): List<Branch> {
         val branchRegex = """(if|when|else|else\s+if)\s*\([^)]*\)""".toRegex()
         return branchRegex.findAll(code).map { match ->
             Branch(
@@ -28,7 +28,7 @@ class CodeParser(private val code: String) {
         }.toList()
     }
 
-    private fun findConditions(): List<Condition> {
+    private fun findConditions(code: String): List<Condition> {
         val conditionRegex = """(if|when)\s*\(([^)]*)\)""".toRegex()
         return conditionRegex.findAll(code).map { match ->
             val conditions = match.groupValues[2].split("&&|\\|\\|".toRegex())
@@ -41,7 +41,7 @@ class CodeParser(private val code: String) {
         }.flatten().toList()
     }
 
-    private fun findStatements(): List<Statement> {
+    private fun findStatements(code: String): List<Statement> {
         val statementRegex = """[^;{}]+;""".toRegex()
         return statementRegex.findAll(code).map { match ->
             Statement(
@@ -51,9 +51,9 @@ class CodeParser(private val code: String) {
         }.toList()
     }
 
-    private fun findPaths(): List<Path> {
+    private fun findPaths(code: String): List<Path> {
         val paths = mutableListOf<Path>()
-        val branches = findBranches()
+        val branches = findBranches(code)
 
         // Простий алгоритм для знаходження шляхів
         var currentPath = mutableListOf<Branch>()

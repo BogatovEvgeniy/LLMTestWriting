@@ -3,7 +3,7 @@ package testMetrics.session
 import generator.Generators
 import java.io.File
 
-class TestSession(
+class TestSessionImpl(
     val sessionId: Int,
     val timestamp: Long,
     val generators: List<Generators>,
@@ -25,12 +25,12 @@ class TestSession(
         }
     }
 
-    fun loadResults(): Map<Generators, String> {
+    fun loadResults(fileName:String): Map<Generators, String> {
         return generators.mapNotNull { generator ->
             val sessionDir = File(basePath, "${getGeneratorPath(generator)}/session$sessionId")
             if (sessionDir.exists() && sessionDir.isDirectory) {
                 val tests = sessionDir.listFiles()
-                    ?.filter { it.extension == "kt" }
+                    ?.filter { it.extension == "kt" && it.name == fileName }
                     ?.joinToString("\n") { it.readText() }
                 if (!tests.isNullOrEmpty()) {
                     generator to tests

@@ -3,10 +3,19 @@ package testMetrics
 import generator.Generators
 import java.io.File
 import com.google.gson.Gson
+import testMetrics.analyzer.BasicMetricsAnalyzer
+import testMetrics.analyzer.CoverageAnalyzer
+import testMetrics.analyzer.QualityAnalyzer
+import testMetrics.analyzer.ReadabilityAnalyzer
 
-class TestGeneratorComparator(
-    private val analyzer: TestQualityAnalyzer = TestQualityAnalyzer()
-) {
+class TestGeneratorComparator {
+    private val analyzer = TestQualityAnalyzer(
+        BasicMetricsAnalyzer(),
+        CoverageAnalyzer(),
+        QualityAnalyzer(),
+        ReadabilityAnalyzer(),
+    )
+
     private val gson = Gson()
 
     fun compareGenerators(

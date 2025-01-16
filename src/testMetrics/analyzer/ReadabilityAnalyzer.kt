@@ -1,6 +1,6 @@
 package testMetrics.analyzer
 
-class ReadabilityAnalyzer : MetricsAnalyzer<ReadabilityMetrics> { // Додаємо типізацію
+class ReadabilityAnalyzer: MetricsAnalyzer<ReadabilityMetrics> { // Додаємо типізацію
     override fun analyze(code: String, test: String): ReadabilityMetrics {
         return ReadabilityMetrics(
             usesBackticks = test.contains("`"),

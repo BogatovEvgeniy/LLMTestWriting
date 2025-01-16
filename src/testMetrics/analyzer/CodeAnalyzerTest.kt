@@ -1,7 +1,8 @@
 package testMetrics.analyzer
 
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 
 class CoverageAnalyzerTest {
 
@@ -20,8 +21,8 @@ class CoverageAnalyzerTest {
             }
         """.trimIndent()
 
-        val analyzer = CoverageAnalyzer(originalCode, testCode)
-        val coverage = analyzer.analyzeCoverage()
+        val analyzer = CoverageAnalyzer()
+        val coverage = analyzer.analyze(originalCode, testCode)
 
         assertTrue(coverage.lineCoverage > 0.0)
         assertEquals(1, coverage.methodsCovered.size)
@@ -47,8 +48,8 @@ class CoverageAnalyzerTest {
             }
         """.trimIndent()
 
-        val analyzer = CoverageAnalyzer(originalCode, testCode)
-        val coverage = analyzer.analyzeCoverage()
+        val analyzer = CoverageAnalyzer()
+        val coverage = analyzer.analyze(originalCode, testCode)
 
         assertEquals(1.0, coverage.branchCoverage)
     }
@@ -75,8 +76,8 @@ class CoverageAnalyzerTest {
             }
         """.trimIndent()
 
-        val analyzer = CoverageAnalyzer(originalCode, testCode)
-        val coverage = analyzer.analyzeCoverage()
+        val analyzer = CoverageAnalyzer()
+        val coverage = analyzer.analyze(originalCode, testCode)
 
         assertTrue(coverage.edgeCasesCovered.any { it.type == "empty" && it.covered })
         assertTrue(coverage.edgeCasesCovered.any { it.type == "null" && it.covered })

@@ -1,10 +1,19 @@
 package testMetrics
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
+import testMetrics.analyzer.BasicMetricsAnalyzer
+import testMetrics.analyzer.CoverageAnalyzer
+import testMetrics.analyzer.QualityAnalyzer
+import testMetrics.analyzer.ReadabilityAnalyzer
 
 class TestQualityAnalyzerTest {
-    private val analyzer = TestQualityAnalyzer()
+    private val analyzer = TestQualityAnalyzer(
+        basicAnalyzer = BasicMetricsAnalyzer(),
+        coverageAnalyzer = CoverageAnalyzer(),
+        qualityAnalyzer = QualityAnalyzer(),
+        readabilityAnalyzer = ReadabilityAnalyzer(),
+    )
 
     @Test
     fun `test basic metrics calculation`() {

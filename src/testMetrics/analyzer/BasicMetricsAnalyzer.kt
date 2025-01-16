@@ -1,6 +1,6 @@
 package testMetrics.analyzer
 
-class BasicMetricsAnalyzer : MetricsAnalyzer<BasicMetrics> {
+class BasicMetricsAnalyzer() : MetricsAnalyzer<BasicMetrics> {
     override fun analyze(code: String, test: String): BasicMetrics {
         val totalTests = countAnnotations(test, "@Test")
         val totalAssertions = countAssertions(test)
@@ -11,7 +11,8 @@ class BasicMetricsAnalyzer : MetricsAnalyzer<BasicMetrics> {
         return BasicMetrics(
             totalTests = totalTests,
             totalAssertions = totalAssertions,
-            averageAssertionsPerTest = averageAssertions
+            averageAssertionsPerTest = averageAssertions,
+            score = TODO()
         )
     }
 

@@ -2,19 +2,26 @@ package testMetrics.collector
 
 import testMetrics.ComparisonResult
 import testMetrics.TestQualityAnalyzer
-import testMetrics.session.TestSession
+import testMetrics.session.TestSessionImpl
 
 class TestResultsCollector(
     private val analyzer: TestQualityAnalyzer,
-    private val sessionManager: TestSession
+    private val sessionManager: TestSessionImpl
 ) {
     fun collectResults(
         originalCode: String,
-        sessionId: Int
+        fileName: String,
     ): List<ComparisonResult> {
-        val session = sessionManager.getSession(sessionId)
-        val tests = session.loadResults()
-        return analyzer.analyzeTests(originalCode, tests)
+        val tests = sessionManager.loadResults(fileName)
+        val qualityResults = mutableListOf<ComparisonResult>()
+        tests.entries.forEach {
+            qualityResults.add(
+                ComparisonResult(
+                    generator = it.key,
+                    analysis = analyzer.analyzeTest(originalCode, it.value)
+                )
+            )
+        }
+        return qualityResults
     }
-}
 }

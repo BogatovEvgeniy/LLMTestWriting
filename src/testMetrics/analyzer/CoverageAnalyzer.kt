@@ -97,16 +97,20 @@ class CoverageAnalyzer : MetricsAnalyzer<CoverageMetrics> {
             ConditionType.EQUALITY -> {
                 test.contains("assertEquals") && test.contains(content)
             }
+
             ConditionType.INEQUALITY -> {
                 test.contains("assertNotEquals") && test.contains(content)
             }
+
             ConditionType.GREATER_THAN, ConditionType.LESS_THAN -> {
                 test.contains(content) && test.contains("assert.*[<>]".toRegex())
             }
+
             ConditionType.CONTAINS -> {
                 test.contains(content) &&
                         (test.contains("contains") || test.contains("assertTrue"))
             }
+
             ConditionType.OTHER -> test.contains(content)
         }
     }
@@ -129,15 +133,18 @@ class CoverageAnalyzer : MetricsAnalyzer<CoverageMetrics> {
                 val variable = content.substringBefore("=").trim()
                 test.contains("assert.*$variable".toRegex())
             }
+
             StatementType.METHOD_CALL -> {
                 val methodName = content.substringBefore("(")
                 test.contains(methodName)
             }
+
             StatementType.RETURN -> {
                 val returnValue = content.substringAfter("return").trim()
                 test.contains("assertEquals.*$returnValue".toRegex()) ||
                         test.contains("assertThat.*$returnValue".toRegex())
             }
+
             StatementType.OTHER -> test.contains(content)
         }
     }

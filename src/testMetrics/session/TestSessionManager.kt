@@ -4,9 +4,9 @@ import generator.Generators
 import java.io.File
 
 class TestSessionManager(private val basePath: String) {
-    fun createSession(generators: List<Generators>): TestSession {
+    fun createSession(generators: List<Generators>): TestSessionImpl {
         val sessionId = getNextSessionId()
-        return TestSession(
+        return TestSessionImpl(
             sessionId = sessionId,
             timestamp = System.currentTimeMillis(),
             generators = generators,
@@ -14,9 +14,9 @@ class TestSessionManager(private val basePath: String) {
         )
     }
 
-    fun getSession(sessionId: Int): TestSession? {
+    fun getSession(sessionId: Int): TestSessionImpl? {
         return if (sessionExists(sessionId)) {
-            TestSession(
+            TestSessionImpl(
                 sessionId = sessionId,
                 timestamp = getSessionTimestamp(sessionId),
                 generators = getSessionGenerators(sessionId),

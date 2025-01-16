@@ -1,6 +1,6 @@
 package testMetrics.analyzer
 
-class QualityAnalyzer : MetricsAnalyzer<QualityMetrics> {
+class QualityAnalyzer() : MetricsAnalyzer<QualityMetrics> {
     override fun analyze(code: String, test: String): QualityMetrics {
         return QualityMetrics(
             hasDescriptiveNames = checkDescriptiveNames(test),
