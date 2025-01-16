@@ -1,0 +1,36 @@
+Test Generator Comparison Report
+================================
+
+1. GEMINI
+Score: 92
+Basic Metrics:
+  - Total Tests: 8
+  - Total Assertions: 12
+  - Avg Assertions per Test: 1.5
+Coverage:
+  - Methods Covered: [put, get, cleanExpiredEntries]
+  - Edge Cases: 0/5
+Quality:
+  - Descriptive Names: true
+  - Assertion Variety: true
+Readability:
+  - Uses Backticks: true
+  - Has Comments: true
+  - Average Test Length: 12
+
+2. CODELLAMA
+Score: 86
+Basic Metrics:
+  - Total Tests: 10
+  - Total Assertions: 14
+  - Avg Assertions per Test: 1.4
+Coverage:
+  - Methods Covered: [put, get, isExpired, cleanExpiredEntries]
+  - Edge Cases: 0/5
+Quality:
+  - Descriptive Names: true
+  - Assertion Variety: true
+Readability:
+  - Uses Backticks: true
+  - Has Comments: true
+  - Average Test Length: 8

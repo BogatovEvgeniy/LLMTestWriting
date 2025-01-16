@@ -1,0 +1,19 @@
+Test Generator Comparison Report
+================================
+
+1. GEMINI
+Score: 73
+Basic Metrics:
+  - Total Tests: 10
+  - Total Assertions: 28
+  - Avg Assertions per Test: 2.8
+Coverage:
+  - Methods Covered: [add, addAll, contains, indexOf, isEmpty, removeAt, set, remove, clear]
+  - Edge Cases: 0/5
+Quality:
+  - Descriptive Names: false
+  - Assertion Variety: true
+Readability:
+  - Uses Backticks: true
+  - Has Comments: false
+  - Average Test Length: 13

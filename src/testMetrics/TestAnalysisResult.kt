@@ -1,5 +1,10 @@
 package testMetrics
 
+import testMetrics.analyzer.BasicMetrics
+import testMetrics.analyzer.CoverageMetrics
+import testMetrics.analyzer.QualityMetrics
+import testMetrics.analyzer.ReadabilityMetrics
+
 data class TestAnalysisResult(
     val basicMetrics: BasicMetrics,
     val coverageMetrics: CoverageMetrics,

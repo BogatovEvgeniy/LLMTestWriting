@@ -1,4 +1,4 @@
-package testMetrics
+package testMetrics.analyzer
 
 data class BasicMetrics(
     val totalTests: Int,

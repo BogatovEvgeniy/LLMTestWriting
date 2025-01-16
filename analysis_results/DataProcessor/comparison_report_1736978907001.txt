@@ -1,0 +1,36 @@
+Test Generator Comparison Report
+================================
+
+1. GPT
+Score: 75
+Basic Metrics:
+  - Total Tests: 5
+  - Total Assertions: 9
+  - Avg Assertions per Test: 1.8
+Coverage:
+  - Methods Covered: [processData]
+  - Edge Cases: 0/5
+Quality:
+  - Descriptive Names: true
+  - Assertion Variety: false
+Readability:
+  - Uses Backticks: true
+  - Has Comments: true
+  - Average Test Length: 16
+
+2. GEMINI
+Score: 74
+Basic Metrics:
+  - Total Tests: 5
+  - Total Assertions: 14
+  - Avg Assertions per Test: 2.8
+Coverage:
+  - Methods Covered: [processData]
+  - Edge Cases: 0/5
+Quality:
+  - Descriptive Names: true
+  - Assertion Variety: false
+Readability:
+  - Uses Backticks: true
+  - Has Comments: true
+  - Average Test Length: 13
