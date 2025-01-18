@@ -1,7 +1,6 @@
 import generator.Generators
 import generator.TestGeneratorFactory
 import prompt.SimplePrompt
-import testMetrics.model.GenerationResult
 import testMetrics.timing.TimingCollector
 import java.io.File
 import com.google.gson.Gson
