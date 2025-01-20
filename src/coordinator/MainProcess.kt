@@ -28,6 +28,7 @@ object MainProcess {
             results.append(analysisResults)
             results.append("Analysis completed\n")
             results.append("Results of analysis...\n")
+            println("Python code running below")
             runPythonProject()
 
             return results.toString()

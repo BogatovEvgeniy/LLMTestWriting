@@ -1,10 +1,11 @@
 package coordinator
 
 data class TestGenerationConfig(
-    val basicMetricsWeight: Double = 0.25,
-    val coverageMetricsWeight: Double = 0.25,
-    val qualityMetricsWeight: Double = 0.25,
-    val readabilityMetricsWeight: Double = 0.25,
+    val basicMetricsWeight: Double = 0.2,
+    val coverageMetricsWeight: Double = 0.2,
+    val qualityMetricsWeight: Double = 0.2,
+    val readabilityMetricsWeight: Double = 0.2,
+    val timingMetricsWeight: Double = 0.2,
 
     val useGPT: Boolean = false,
     val useGemini: Boolean = false,

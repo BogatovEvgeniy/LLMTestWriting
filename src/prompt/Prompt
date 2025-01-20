@@ -1,1 +1,5 @@
-Provide me a set of unit test for the provided codebase. Make sure AAA (Arrange-Act-Assert) Pattern is applied. Make sure the Edge cases are covered (zero, negative tests, empty, null, large values). If you check null for example then add to the test name null word. Make sure the boundary values are covered
+Act like a developer
+Write unit test for the provided class
+Make sure AAA (Arrange-Act-Assert) pattern is applied
+Make sure the Edge cases are covered (zero, negative tests, empty, null, large values). If you check null for example then add to the test name null word
+Make sure the boundary values are covered

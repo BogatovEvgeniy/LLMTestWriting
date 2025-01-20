@@ -11,10 +11,11 @@ class TestGeneratorUI : JFrame("LLM Test Generator") {
     private val resultArea = JTextArea()
 
     // Weight spinners
-    private val basicMetricsWeight = JSpinner(SpinnerNumberModel(0.25, 0.0, 1.0, 0.05))
-    private val coverageMetricsWeight = JSpinner(SpinnerNumberModel(0.25, 0.0, 1.0, 0.05))
-    private val qualityMetricsWeight = JSpinner(SpinnerNumberModel(0.25, 0.0, 1.0, 0.05))
-    private val readabilityMetricsWeight = JSpinner(SpinnerNumberModel(0.25, 0.0, 1.0, 0.05))
+    private val basicMetricsWeight = JSpinner(SpinnerNumberModel(0.2, 0.0, 1.0, 0.05))
+    private val coverageMetricsWeight = JSpinner(SpinnerNumberModel(0.2, 0.0, 1.0, 0.05))
+    private val qualityMetricsWeight = JSpinner(SpinnerNumberModel(0.2, 0.0, 1.0, 0.05))
+    private val readabilityMetricsWeight = JSpinner(SpinnerNumberModel(0.2, 0.0, 1.0, 0.05))
+    private val timingMetricsWeight = JSpinner(SpinnerNumberModel(0.2, 0.0, 1.0, 0.05))
 
     // LLM checkboxes
     private val useGPT = JCheckBox("GPT", false)
@@ -73,18 +74,20 @@ class TestGeneratorUI : JFrame("LLM Test Generator") {
     }
 
     private fun createMetricsPanel(): JPanel {
-        val panel = JPanel(GridLayout(4, 2, 10, 10))
+        val panel = JPanel(GridLayout(5, 2, 10, 10))
         panel.border = BorderFactory.createTitledBorder("Metrics Weights Configuration")
 
         panel.apply {
-            add(JLabel("Basic Metrics Weight:"))
+            add(JLabel("Basic Metric Weight:"))
             add(basicMetricsWeight)
-            add(JLabel("Coverage Metrics Weight:"))
+            add(JLabel("Coverage Metric Weight:"))
             add(coverageMetricsWeight)
-            add(JLabel("Quality Metrics Weight:"))
+            add(JLabel("Quality Metric Weight:"))
             add(qualityMetricsWeight)
-            add(JLabel("Readability Metrics Weight:"))
+            add(JLabel("Readability Metric Weight:"))
             add(readabilityMetricsWeight)
+            add(JLabel("Timing Metric Weight:"))
+            add(timingMetricsWeight)
         }
 
         return panel
@@ -151,7 +154,8 @@ class TestGeneratorUI : JFrame("LLM Test Generator") {
         val sum = (basicMetricsWeight.value as Double) +
                 (coverageMetricsWeight.value as Double) +
                 (qualityMetricsWeight.value as Double) +
-                (readabilityMetricsWeight.value as Double)
+                (readabilityMetricsWeight.value as Double)+
+                (timingMetricsWeight.value as Double)
 
         if (Math.abs(sum - 1.0) > 0.001) {
             throw IllegalArgumentException("Weights must sum to 1.0 (current sum: $sum)")
@@ -167,6 +171,7 @@ class TestGeneratorUI : JFrame("LLM Test Generator") {
             coverageMetricsWeight = coverageMetricsWeight.value as Double,
             qualityMetricsWeight = qualityMetricsWeight.value as Double,
             readabilityMetricsWeight = readabilityMetricsWeight.value as Double,
+            timingMetricsWeight = timingMetricsWeight.value as Double,
             useGPT = useGPT.isSelected,
             useGemini = useGemini.isSelected,
             useCodeLlama = useCodeLlama.isSelected,
