@@ -1,7 +1,9 @@
 package testMetrics
 
 data class CoverageMetrics(
-    val methodsCovered: Set<String>,
+    val methodsCovered: Int = 0,
     val edgeCasesCovered: List<EdgeCase>,
-    val boundaryTests: List<String>
+    val boundaryTests: List<String>,
+    val edgeCasesCount: Int = 0,
+    val boundaryTestsCount: Int = 0
 )

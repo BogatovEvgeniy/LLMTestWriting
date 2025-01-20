@@ -1,12 +1,15 @@
 package testMetrics
 
-class TestQualityAnalyzer {
+import coordinator.TestGenerationConfig
+
+class TestQualityAnalyzer(private val config: TestGenerationConfig) {
     fun analyzeTest(originalCode: String, generatedTest: String): TestAnalysisResult {
         return TestAnalysisResult(
             basicMetrics = analyzeBasicMetrics(generatedTest),
             coverageMetrics = analyzeCoverage(originalCode, generatedTest),
             qualityMetrics = analyzeQuality(generatedTest),
-            readabilityMetrics = analyzeReadability(generatedTest)
+            readabilityMetrics = analyzeReadability(generatedTest),
+            config = config
         )
     }
 
@@ -25,13 +28,25 @@ class TestQualityAnalyzer {
     private fun analyzeCoverage(originalCode: String, test: String): CoverageMetrics {
         val methods = extractMethods(originalCode)
         val testedMethods = findTestedMethods(test, methods)
-        val edgeCases = analyzeEdgeCases(test)
-        val boundaryTests = findBoundaryTests(test)
+        val edgeCases = analyzeEdgeCases(test, methods)
+        val boundaryTests = findBoundaryTests(test, methods)
+
+        // Calculate methods coverage by tests
+        val methodsCoverage = testedMethods.size/methods.size
+        // Calculate methods with edge cases and boundary tests
+        val methodsWithEdgeCases = methods.count { method ->
+            analyzeEdgeCases(test, setOf(method)).isNotEmpty()
+        }
+        val methodsWithBoundaryTests = methods.count { method ->
+            findBoundaryTests(test, setOf(method)).isNotEmpty()
+        }
 
         return CoverageMetrics(
-            methodsCovered = testedMethods,
+            methodsCovered = methodsCoverage,
             edgeCasesCovered = edgeCases,
-            boundaryTests = boundaryTests
+            boundaryTests = boundaryTests,
+            edgeCasesCount = methodsWithEdgeCases,
+            boundaryTestsCount = methodsWithBoundaryTests
         )
     }
 
@@ -63,9 +78,9 @@ class TestQualityAnalyzer {
     }
 
     private fun extractMethods(code: String): Set<String> {
-        val methodPattern = "fun\\s+(\\w+)\\s*\\(".toRegex()
+        val methodPattern = "(fun|void)\\s+(\\w+)\\s*\\(".toRegex()
         return methodPattern.findAll(code)
-            .map { it.groupValues[1] }
+            .map { it.groupValues[2] }
             .toSet()
     }
 
@@ -75,27 +90,27 @@ class TestQualityAnalyzer {
         }.toSet()
     }
 
-    private fun analyzeEdgeCases(test: String): List<EdgeCase> {
+    private fun analyzeEdgeCases(test: String, methods: Set<String>): List<EdgeCase> {
         return listOf(
-            EdgeCase("zero", test.contains("test.*0")),
-            EdgeCase("negative", test.contains("test.*negative")),
-            EdgeCase("empty", test.contains("test.*empty")),
-            EdgeCase("null", test.contains("test.*null")),
-            EdgeCase("large_values", test.contains("test.*large"))
-        )
+            EdgeCase("zero", methods.any { method -> (test.contains(method) && (test.contains("0") || test.contains("zero"))) }),
+            EdgeCase("negative", methods.any { method -> (test.contains(method) && (test.contains("negative") || test.contains("-"))) }),
+            EdgeCase("empty", methods.any { method -> (test.contains(method) && (test.contains("empty") || test.contains("blank"))) }),
+            EdgeCase("null", methods.any { method -> (test.contains(method) && (test.contains("null"))) }),
+            EdgeCase("large_values", methods.any { method -> (test.contains(method) && (test.contains("large") || test.contains("big"))) }),
+        ).filter { it.covered }
     }
 
-    private fun findBoundaryTests(test: String): List<String> {
-        val boundaryPattern = "test.*(?:boundary|limit|max|min).*".toRegex(RegexOption.IGNORE_CASE)
-        return boundaryPattern.findAll(test)
-            .map { it.value }
-            .toList()
+    private fun findBoundaryTests(test: String, methods: Set<String>): List<String> {
+        return methods.filter { method ->
+            val boundaryPattern = ".*(?:boundary|limit|max|min).*".toRegex(RegexOption.IGNORE_CASE)
+            test.contains(method) && boundaryPattern.containsMatchIn(test)
+        }.toList()
     }
 
     private fun checkDescriptiveNames(test: String): Boolean {
-        val testNamePattern = "@Test\\s*fun\\s+`([^`]+)`".toRegex()
+        val testNamePattern = "@Test\\s*(fun|void)\\s+`([^`]+)`".toRegex()
         val testNames = testNamePattern.findAll(test)
-            .map { it.groupValues[1] }
+            .map { it.groupValues[2] }
         return testNames.all { it.split(" ").size >= 3 }
     }
 
@@ -117,7 +132,7 @@ class TestQualityAnalyzer {
     }
 
     private fun checkNamingConventions(test: String): Boolean {
-        val testMethodPattern = "fun\\s+`?\\w+`?\\s*\\(".toRegex()
+        val testMethodPattern = "(fun|void)\\s+`?\\w+`?\\s*\\(".toRegex()
         val methods = testMethodPattern.findAll(test)
         return methods.all { it.value.contains("`") }
     }

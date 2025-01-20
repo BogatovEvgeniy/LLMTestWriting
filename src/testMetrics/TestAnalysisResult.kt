@@ -1,34 +1,50 @@
 package testMetrics
 
+import coordinator.TestGenerationConfig
+
 data class TestAnalysisResult(
     val basicMetrics: BasicMetrics,
     val coverageMetrics: CoverageMetrics,
     val qualityMetrics: QualityMetrics,
-    val readabilityMetrics: ReadabilityMetrics
+    val readabilityMetrics: ReadabilityMetrics,
+    private val config: TestGenerationConfig
 ) {
-    val score: Int get() {
-        var score = 0
+    val basicScore: Double
+        get() {
+            var basic = 0
+            basic += (basicMetrics.totalTests * 3)
+            basic += (basicMetrics.averageAssertionsPerTest * 10).toInt()
+            return (basic * config.basicMetricsWeight)
+        }
 
-        // Basic metrics (30 points)
-        score += (basicMetrics.totalTests * 3).coerceAtMost(15)
-        score += (basicMetrics.averageAssertionsPerTest * 10).toInt().coerceAtMost(15)
+    val coverageScore: Double
+        get() {
+            var coverage = 0
+            coverage += (coverageMetrics.methodsCovered * 10)
+            coverage += coverageMetrics.edgeCasesCovered.count { it.covered } * 2
+            coverage += (coverageMetrics.boundaryTests.size * 2)
+            return (coverage * config.coverageMetricsWeight)
+        }
 
-        // Coverage metrics (30 points)
-        score += (coverageMetrics.methodsCovered.size * 10).coerceAtMost(20)
-        score += coverageMetrics.edgeCasesCovered.count { it.covered } * 2
-        score += (coverageMetrics.boundaryTests.size * 2).coerceAtMost(6)
+    val qualityScore: Double
+        get() {
+            var quality = 0
+            if (qualityMetrics.hasDescriptiveNames) quality += 5
+            if (qualityMetrics.usesAssertionVariety) quality += 5
+            if (qualityMetrics.hasTestDocumentation) quality += 5
+            if (qualityMetrics.followsNamingConventions) quality += 5
+            return (quality * config.qualityMetricsWeight)
+        }
 
-        // Quality metrics (20 points)
-        if (qualityMetrics.hasDescriptiveNames) score += 5
-        if (qualityMetrics.usesAssertionVariety) score += 5
-        if (qualityMetrics.hasTestDocumentation) score += 5
-        if (qualityMetrics.followsNamingConventions) score += 5
+    val readabilityScore: Double
+        get() {
+            var readability = 0
+            if (readabilityMetrics.usesBackticks) readability += 7
+            if (readabilityMetrics.hasComments) readability += 7
+            if (readabilityMetrics.averageTestLength in 5..25) readability += 6
+            return (readability * config.readabilityMetricsWeight)
+        }
 
-        // Readability metrics (20 points)
-        if (readabilityMetrics.usesBackticks) score += 7
-        if (readabilityMetrics.hasComments) score += 7
-        if (readabilityMetrics.averageTestLength in 5..25) score += 6
-
-        return score.coerceIn(0, 100)
-    }
+    val score: Double
+        get() = (basicScore + coverageScore + qualityScore + readabilityScore)
 }

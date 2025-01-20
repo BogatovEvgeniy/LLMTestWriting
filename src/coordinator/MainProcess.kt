@@ -24,10 +24,11 @@ object MainProcess {
 
             // Analyze Tests
             results.append("Starting test analysis...\n")
-            val analysisResults = analyzeTests()
+            val analysisResults = analyzeTests(config)
             results.append(analysisResults)
             results.append("Analysis completed\n")
             results.append("Results of analysis...\n")
+            println("Python code running below")
             runPythonProject()
 
             return results.toString()
@@ -119,9 +120,9 @@ object MainProcess {
         }
     }
 
-    private fun analyzeTests(): String {
+    private fun analyzeTests(config: TestGenerationConfig): String {
         val sysDir = System.getProperty("user.dir")
-        val testComparator = TestGeneratorComparator()
+        val testComparator = TestGeneratorComparator(config)
         val analysisResults = StringBuilder()
 
         // Read original files
@@ -146,7 +147,7 @@ object MainProcess {
                     analysisResults.append("\n${result.generator}:\n")
                     analysisResults.append("Score: ${result.analysis.score}\n")
                     analysisResults.append("Tests: ${result.analysis.basicMetrics.totalTests}\n")
-                    analysisResults.append("Coverage: ${result.analysis.coverageMetrics.methodsCovered.size} methods\n")
+                    analysisResults.append("Coverage: ${result.analysis.coverageMetrics.methodsCovered} methods\n")
                 }
             } else {
                 analysisResults.append("No generated tests found\n")

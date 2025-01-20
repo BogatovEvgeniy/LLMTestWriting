@@ -1,10 +1,24 @@
 package testMetrics
 
+import coordinator.TestGenerationConfig
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 
 class TestQualityAnalyzerTest {
-    private val analyzer = TestQualityAnalyzer()
+    private val testConfig = TestGenerationConfig(
+        basicMetricsWeight = 0.3,
+        coverageMetricsWeight = 0.3,
+        qualityMetricsWeight = 0.2,
+        readabilityMetricsWeight = 0.2,
+        timingMetricsWeight = 0.0,
+        useGPT = true,
+        useGemini = false,
+        useCodeLlama = false,
+        prompt = ""
+    )
+
+    // Add this line to initialize the analyzer
+    private val analyzer = TestQualityAnalyzer(testConfig)
 
     @Test
     fun `test basic metrics calculation`() {

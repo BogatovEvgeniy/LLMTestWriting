@@ -3,10 +3,12 @@ package testMetrics
 import generator.Generators
 import java.io.File
 import com.google.gson.Gson
+import coordinator.TestGenerationConfig
 import testMetrics.model.GenerationResult
 
 class TestGeneratorComparator(
-    private val analyzer: TestQualityAnalyzer = TestQualityAnalyzer()
+    private val config: TestGenerationConfig,
+    private val analyzer: TestQualityAnalyzer = TestQualityAnalyzer(config)
 ) {
     private val gson = Gson()
 
@@ -52,7 +54,12 @@ class TestGeneratorComparator(
 
         results.forEachIndexed { index, result ->
             sb.appendLine("\n${index + 1}. ${result.generator}")
-            sb.appendLine("Score: ${result.analysis.score}")
+            sb.appendLine("Total Score: ${result.analysis.score}")
+            sb.appendLine("Scores by Category:")
+            sb.appendLine("  - Basic Score: ${result.analysis.basicScore}")
+            sb.appendLine("  - Coverage Score: ${result.analysis.coverageScore}")
+            sb.appendLine("  - Quality Score: ${result.analysis.qualityScore}")
+            sb.appendLine("  - Readability Score: ${result.analysis.readabilityScore}")
 
             // Basic Metrics
             sb.appendLine("Basic Metrics:")
@@ -64,6 +71,7 @@ class TestGeneratorComparator(
             sb.appendLine("Coverage:")
             sb.appendLine("  - Methods Covered: ${result.analysis.coverageMetrics.methodsCovered}")
             sb.appendLine("  - Edge Cases: ${result.analysis.coverageMetrics.edgeCasesCovered.count { it.covered }}/${result.analysis.coverageMetrics.edgeCasesCovered.size}")
+            sb.appendLine("  - Boundary Tests: ${result.analysis.coverageMetrics.boundaryTests}")
 
             // Quality
             sb.appendLine("Quality:")
