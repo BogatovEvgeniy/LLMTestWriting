@@ -8,9 +8,9 @@ import java.time.Duration
 object RestClientFactory {
     fun create(host: String): Retrofit {
         val client = OkHttpClient.Builder()
-            .connectTimeout(Duration.ofSeconds(20))
-            .callTimeout(Duration.ofSeconds(20))
-            .readTimeout(Duration.ofSeconds(20))
+            .connectTimeout(Duration.ofSeconds(120))
+            .callTimeout(Duration.ofSeconds(120))
+            .readTimeout(Duration.ofSeconds(120))
             .build()
         return Retrofit.Builder()
             .baseUrl(host)

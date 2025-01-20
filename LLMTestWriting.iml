@@ -12,5 +12,6 @@
     <orderEntry type="library" name="squareup.retrofit2.converter.gson" level="project" />
     <orderEntry type="library" name="junit" level="project" />
     <orderEntry type="library" name="junit.jupiter" level="project" />
+    <orderEntry type="library" name="squareup.okhttp3.logging.interceptor" level="project" />
   </component>
 </module>

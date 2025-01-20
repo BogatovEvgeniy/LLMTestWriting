@@ -18,6 +18,7 @@ object GptTestGenerator : TestGenerator {
     var service: GPTCompletionService
 
     init {
+
         val retrofit = RestClientFactory.create(Secrets.gptHost)
         service = retrofit.create(GPTCompletionService::class.java)
     }
