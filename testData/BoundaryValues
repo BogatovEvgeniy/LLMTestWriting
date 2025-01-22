@@ -1,0 +1,12 @@
+public int calculateDiscount(int purchaseAmount) {
+  if (purchaseAmount < 0) { 
+    throw new IllegalArgumentException("Purchase amount cannot be negative."); 
+  }
+  if (purchaseAmount >= 1000) {
+    return 20; // 20% discount for purchases over 1000
+  } else if (purchaseAmount >= 500) {
+    return 10; // 10% discount for purchases over 500
+  } else {
+    return 0; // No discount 
+  }
+}
