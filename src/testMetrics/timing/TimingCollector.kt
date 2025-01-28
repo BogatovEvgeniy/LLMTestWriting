@@ -32,7 +32,7 @@ class TimingCollector {
             totalGenerationTimeMs = totalTime,
             promptGenerationTimeMs = getDuration("prompt_start", "prompt_end"),
             apiCallTimeMs = getDuration("api_start", "api_end"),
-            perFileGenerationTimes = perFileTimings.toMap(),
+            //perFileGenerationTimes = perFileTimings.toMap(),
             averageFileGenerationTimeMs = avgFileTime,
             parsingTimeMs = getDuration("parsing_start", "parsing_end"),
             testAnalysisTimeMs = getDuration("analysis_start", "analysis_end")

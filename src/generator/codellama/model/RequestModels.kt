@@ -3,6 +3,7 @@ package generator.codellama.model
 data class LlamaCompletionRequest(
     val messages: List<Message>,
     val model: String = "llama3.1-70b",
+    val parameters: GenerationParameters,
 //    val functions: List<Function> = emptyList(),
 //    val stream: Boolean = false,
 //    val function_call: String = ""

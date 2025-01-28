@@ -20,13 +20,13 @@ object CodeLlamaTestGenerator : TestGenerator {
     override fun generateTestsFor(llmPrompt: String, code: String): String {
         val response = service.generateTests(
             LlamaCompletionRequest(
-               messages = listOf(Message(role = "user", content = buildPrompt(llmPrompt, code))),
-//                parameters = GenerationParameters(
-//                    maxNewTokens = 1000,
-//                    temperature = 0.7,
-//                    topP = 0.95,
-//                    repetitionPenalty = 1.1
-//                )
+                messages = listOf(Message(role = "user", content = buildPrompt(llmPrompt, code))),
+                parameters = GenerationParameters(
+                    maxNewTokens = 1000,
+                    temperature = 0.7,
+                    topP = 0.95,
+                    repetitionPenalty = 1.1
+                )
             )
         ).execute()
 
@@ -62,3 +62,5 @@ object CodeLlamaTestGenerator : TestGenerator {
         fun generateTests(@Body request: LlamaCompletionRequest): Call<LamaCompletionResponse>
     }
 }
+
+

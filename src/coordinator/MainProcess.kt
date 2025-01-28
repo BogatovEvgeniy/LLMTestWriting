@@ -8,6 +8,10 @@ import testMetrics.model.GenerationResult
 import testMetrics.timing.TimingCollector
 import java.io.File
 import com.google.gson.Gson
+import testMetrics.ComparisonResult
+import testMetrics.add
+import testMetrics.applyThreshold
+import testMetrics.timing.add
 import testMetrics.timing.TimingMetrics
 
 object MainProcess {
@@ -75,7 +79,7 @@ object MainProcess {
     ) {
         println("\nGenerating tests using ${generator.name}")
 
-        val resultPath = when(generator) {
+        val resultPath = when (generator) {
             Generators.GPT -> "result/gpt"
             Generators.GEMINI -> "result/gemini"
             Generators.CODELLAMA -> "result/codellama"
@@ -127,6 +131,8 @@ object MainProcess {
 
         // Read original files
         val codeDir = File(sysDir, "testData")
+        val totalFiles = codeDir.listFiles()?.size ?: 0
+        var lastResult: List<ComparisonResult>? = null
         codeDir.listFiles()?.forEach { originalFile ->
             analysisResults.append("\nAnalyzing tests for: ${originalFile.name}\n")
             val originalCode = originalFile.readText()
@@ -137,24 +143,54 @@ object MainProcess {
             if (generatedTests.isNotEmpty()) {
                 val results = testComparator.compareGenerators(originalCode, generatedTests)
 
-                // Save results
-                val analysisDir = File(sysDir, "analysis_results")
-                analysisDir.mkdirs()
-                testComparator.saveResults(results, analysisDir.absolutePath)
+                if (lastResult == null) lastResult = results
+                else lastResult = updateResults(results, lastResult, totalFiles)
 
-                // Add results to output
-                results.forEach { result ->
-                    analysisResults.append("\n${result.generator}:\n")
-                    analysisResults.append("Score: ${result.analysis.score}\n")
-                    analysisResults.append("Tests: ${result.analysis.basicMetrics.totalTests}\n")
-                    analysisResults.append("Coverage: ${result.analysis.coverageMetrics.methodsCovered} methods\n")
-                }
             } else {
                 analysisResults.append("No generated tests found\n")
             }
         }
+        lastResult = lastResult?.map { it.applyThreshold(totalFiles) }
 
+        // Add results to output
+        lastResult?.let {
+            it.forEach { result ->
+                analysisResults.append("\n${result.generator}:\n")
+                analysisResults.append("Score: ${result.analysis.score}\n")
+                analysisResults.append("Tests: ${result.analysis.basicMetrics.totalTests}\n")
+                analysisResults.append("Coverage: ${result.analysis.coverageMetrics.methodsCovered} methods\n")
+            }
+
+            // Save results
+            val analysisDir = File(sysDir, "analysis_results")
+            analysisDir.mkdirs()
+            testComparator.saveResults(it, analysisDir.absolutePath)
+        }
         return analysisResults.toString()
+    }
+
+    private fun updateResults(
+        results: List<ComparisonResult>,
+        lastResult: List<ComparisonResult>,
+        totalFiles: Int
+    ): List<ComparisonResult> {
+        val finalAnalysisStructure = mutableListOf<ComparisonResult>()
+        lastResult.forEach { lastResultItem ->
+            val llmResults = results.find { lastResultItem.generator == it.generator }
+            llmResults!!.let {
+                finalAnalysisStructure.add(
+                    ComparisonResult(
+                        generator = lastResultItem.generator,
+                        analysis = lastResultItem.analysis.add(llmResults.analysis),
+                        timestamp = lastResultItem.timestamp,
+                        timingMetrics = lastResultItem.timingMetrics.add(llmResults.timingMetrics),
+                        scores = lastResultItem.scores.add(llmResults.scores)
+                    )
+                )
+            }
+        }
+        // Apply threshold to each ComparisonResult in finalAnalysisStructure
+        return finalAnalysisStructure
     }
 
     private fun collectGeneratedTestsFromSessions(
@@ -214,7 +250,7 @@ object MainProcess {
 
                 return GenerationResult(
                     tests = testFile.readText(),
-                    timingMetrics = timingMetrics ?: TimingMetrics(0, 0, 0, emptyMap(), 0.0, 0, 0)
+                    timingMetrics = timingMetrics ?: TimingMetrics(0, 0, 0, 0.0, 0, 0)
                 )
             }
         }

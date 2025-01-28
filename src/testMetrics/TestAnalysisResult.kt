@@ -7,7 +7,7 @@ data class TestAnalysisResult(
     val coverageMetrics: CoverageMetrics,
     val qualityMetrics: QualityMetrics,
     val readabilityMetrics: ReadabilityMetrics,
-    private val config: TestGenerationConfig
+    val config: TestGenerationConfig
 ) {
     val basicScore: Double
         get() {
@@ -29,22 +29,42 @@ data class TestAnalysisResult(
     val qualityScore: Double
         get() {
             var quality = 0
-            if (qualityMetrics.hasDescriptiveNames) quality += 5
-            if (qualityMetrics.usesAssertionVariety) quality += 5
-            if (qualityMetrics.hasTestDocumentation) quality += 5
-            if (qualityMetrics.followsNamingConventions) quality += 5
+            if (qualityMetrics.hasDescriptiveNames > 0) quality += 5  // Check if count is greater than 0
+            if (qualityMetrics.usesAssertionVariety > 0) quality += 5   // Check if count is greater than 0
+            if (qualityMetrics.hasTestDocumentation > 0) quality += 5   // Check if count is greater than 0
+            if (qualityMetrics.followsNamingConventions > 0) quality += 5 // Check if count is greater than 0
             return (quality * config.qualityMetricsWeight)
         }
 
     val readabilityScore: Double
         get() {
             var readability = 0
-            if (readabilityMetrics.usesBackticks) readability += 7
-            if (readabilityMetrics.hasComments) readability += 7
+            if (readabilityMetrics.usesBackticks > 0) readability += 7   // Check if count is greater than 0
+            if (readabilityMetrics.hasComments > 0) readability += 7     // Check if count is greater than 0
             if (readabilityMetrics.averageTestLength in 5..25) readability += 6
             return (readability * config.readabilityMetricsWeight)
         }
 
     val score: Double
         get() = (basicScore + coverageScore + qualityScore + readabilityScore)
+}
+
+fun TestAnalysisResult.add(result: TestAnalysisResult) =
+    TestAnalysisResult(
+        this.basicMetrics.add(result.basicMetrics),
+        this.coverageMetrics.add(result.coverageMetrics),
+        this.qualityMetrics.add(result.qualityMetrics), // Pass totalFiles
+        this.readabilityMetrics.add(result.readabilityMetrics), // Pass totalFiles
+        this.config
+    )
+
+// In TestAnalysisResult class
+fun TestAnalysisResult.applyThreshold(totalFiles: Int): TestAnalysisResult {
+    return TestAnalysisResult(
+        basicMetrics = this.basicMetrics
+        ,coverageMetrics = this.coverageMetrics//.applyThreshold(totalFiles)
+        ,qualityMetrics = this.qualityMetrics.applyThreshold(totalFiles)
+        ,readabilityMetrics = this.readabilityMetrics.applyThreshold(totalFiles)
+        ,config = this.config
+    )
 }

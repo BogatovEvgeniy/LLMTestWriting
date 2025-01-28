@@ -29,3 +29,12 @@ data class ComparisonResult(
         )
     )
 }
+
+fun ComparisonResult.applyThreshold(totalFiles: Int): ComparisonResult {
+    return ComparisonResult(
+        generator = this.generator,
+        analysis = this.analysis.applyThreshold(totalFiles),
+        timestamp = this.timestamp,
+        timingMetrics = this.timingMetrics
+    )
+}

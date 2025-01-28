@@ -38,3 +38,4 @@ object GeminiTestGenerator : TestGenerator {
         ): Call<ResponseData>
     }
 }
+

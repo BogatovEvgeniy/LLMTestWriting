@@ -1,3 +1,0 @@
-public String getFullName(User user) {
-  return user.getFirstName() + " " + user.getLastName();
-}

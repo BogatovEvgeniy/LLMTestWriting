@@ -61,8 +61,8 @@ class TestQualityAnalyzer(private val config: TestGenerationConfig) {
 
     private fun analyzeReadability(test: String): ReadabilityMetrics {
         return ReadabilityMetrics(
-            usesBackticks = test.contains("`"),
-            hasComments = test.contains("//") || test.contains("/*"),
+            usesBackticks = if (test.contains("`")) 1 else 0,
+            hasComments = if (test.contains("//") || test.contains("/*")) 1 else 0,
             averageTestLength = calculateAverageTestLength(test)
         )
     }
@@ -107,14 +107,14 @@ class TestQualityAnalyzer(private val config: TestGenerationConfig) {
         }.toList()
     }
 
-    private fun checkDescriptiveNames(test: String): Boolean {
+    private fun checkDescriptiveNames(test: String): Int {
         val testNamePattern = "@Test\\s*(fun|void)\\s+`([^`]+)`".toRegex()
         val testNames = testNamePattern.findAll(test)
             .map { it.groupValues[2] }
-        return testNames.all { it.split(" ").size >= 3 }
+        return if (testNames.all { it.split(" ").size >= 3 }) 1 else 0
     }
 
-    private fun checkAssertionVariety(test: String): Boolean {
+    private fun checkAssertionVariety(test: String): Int {
         val assertTypes = setOf(
             "assertEquals",
             "assertTrue",
@@ -124,17 +124,17 @@ class TestQualityAnalyzer(private val config: TestGenerationConfig) {
             "assertThrows"
         )
         val usedAsserts = assertTypes.count { test.contains(it) }
-        return usedAsserts >= 3 // Використовується мінімум 3 різних типи assert
+        return if (usedAsserts >= 3) 1 else 0  // Використовується мінімум 3 різних типи assert
     }
 
-    private fun hasTestDocumentation(test: String): Boolean {
-        return test.contains("/**") || test.contains("//")
+    private fun hasTestDocumentation(test: String): Int {
+        return if (test.contains("/**") || test.contains("//")) 1 else 0
     }
 
-    private fun checkNamingConventions(test: String): Boolean {
+    private fun checkNamingConventions(test: String): Int {
         val testMethodPattern = "(fun|void)\\s+`?\\w+`?\\s*\\(".toRegex()
         val methods = testMethodPattern.findAll(test)
-        return methods.all { it.value.contains("`") }
+        return if (methods.all { it.value.contains("`") }) 1 else 0
     }
 
     private fun calculateAverageTestLength(test: String): Int {
@@ -146,3 +146,4 @@ class TestQualityAnalyzer(private val config: TestGenerationConfig) {
         return lengths.average().toInt()
     }
 }
+
