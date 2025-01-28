@@ -5,6 +5,7 @@ fun main() {
     SwingUtilities.invokeLater {
         TestGeneratorUI().apply {
             isVisible = true
+
         }
     }
 }
